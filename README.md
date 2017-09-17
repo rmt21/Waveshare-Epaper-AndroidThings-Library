@@ -4,7 +4,7 @@ Conversion of python waveshare library for their epaper display into java, speci
 
 # Usage
 
-The driver appears to write from the top left down, which means your android layout file will need to abide by this.
+The driver appears to write from the top left down, which means your android layout file will need to abide by this. You will need to input your screen size in relation to what is stated ont he waveshare website into xDot and yDot values in the class.
 
 In your activity you will need to use code such as follows;
 
