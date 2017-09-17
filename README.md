@@ -8,7 +8,8 @@ The driver appears to write from the top left down, which means your android lay
 
 In your activity you will need to use code such as follows;
 
-
+        EPAPER egItems = new EPAPER();
+        //.........
         LayoutInflater inflater = (LayoutInflater) this
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.activity_main,(ViewGroup)findViewById(R.id.main_layout));
