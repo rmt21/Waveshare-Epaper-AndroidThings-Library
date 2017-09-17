@@ -2,6 +2,8 @@
 
 Conversion of python waveshare library for their epaper display into java, specifically for androidthings. This library will allow you to write your android layout directly to the e-paper display.
 
+http://www.waveshare.com/wiki/2.9inch_e-Paper_Module
+
 # Usage
 
 The driver appears to write from the top left down, which means your android layout file will need to abide by this. You will need to input your screen size in relation to what is stated ont he waveshare website into xDot and yDot values in the class.
