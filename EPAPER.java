@@ -1,4 +1,3 @@
-package vitalinstinct.housecontrolepaper;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -6,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.media.Image;
 import android.util.Log;
@@ -23,10 +23,10 @@ import java.util.List;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
 /*
- * Created by Reece on 28/08/2017, vitalinstinct.housecontrolepaper, HouseControlEPAPER
+ * Created by Reece on 28/08/2017
  */
 
-public class EPAPER {
+public class EpdGpioSetup {
 
     private static int xDot = 128;
     private static int yDot = 296;
@@ -38,7 +38,7 @@ public class EPAPER {
     private static int busy = 24;
     private static int cs = 8;
 
-    private static Gpio RST, DC, BUSY, CS;
+    public static Gpio RST, DC, BUSY, CS;
     SpiDevice device;
     PeripheralManagerService service;
 
@@ -276,9 +276,9 @@ public class EPAPER {
             0x3F,(byte)0xFC,0x3F,(byte)0xFC,0x3F,(byte)0xFC,0x3F,(byte)0xFC,0x3F,(byte)0xFC,0x3F,(byte)0xFC,0x00,0x00,0x00,0x00,
             };
 
-    public EPAPER(PeripheralManagerService service)
+    public EpdGpioSetup()
     {
-        this.service = service;
+        this.service = new PeripheralManagerService();
         try {
           //  List<String> spibus =  service.getSpiBusList();
             //List<String> gpiolist =  service.getGpioList();
@@ -291,6 +291,7 @@ public class EPAPER {
             RST.setActiveType(Gpio.ACTIVE_HIGH);
             BUSY.setDirection(Gpio.DIRECTION_IN);
             BUSY.setActiveType(Gpio.ACTIVE_HIGH);
+
             while(device == null)
             {
                 device = getDevice();
@@ -350,7 +351,7 @@ public class EPAPER {
                 Log.d("SYSTEM MESSAGE", "RESET FAILED");
             }
             RST.setValue(true);
-            sleep();
+            //sleep();
             //set register
             Log.d("SYSTEM MESSAGE", "SET REGISTER");
             write(GDOControl); //panel config
@@ -468,9 +469,11 @@ public class EPAPER {
             {
                 for (int ii=0; ii< ySize; ii++)
                 {
-                            buffer = new byte[]{dispBuff[num]};
-                            device.write(buffer, buffer.length);
-                            num++;
+                    if (num < dispBuff.length) {
+                        buffer = new byte[]{dispBuff[num]};
+                        device.write(buffer, buffer.length);
+                        num++;
+                    }
                 }
             }
 
@@ -587,7 +590,7 @@ public class EPAPER {
             partDisplay((xStart/8),(xEnd/8),(yEnd%256),(yEnd/256),(yStart%256),(yStart/256));
             byte[] buffer = new byte[]{dispBuffer[0]};
             writeDispRamMono(xEnd-xStart, yEnd-yStart+1, buffer, xStart, xEnd, yStart, yEnd);
-            sleep();
+           // sleep();
             partDisplay((xStart/8),(xEnd/8),(yEnd%256),(yEnd/256),(yStart%256),(yStart/256));
             writeDispRamMono(xEnd-xStart, yEnd-yStart+1, buffer, xStart, xEnd, yStart, yEnd);
         }
@@ -596,7 +599,7 @@ public class EPAPER {
             partDisplay((xStart/8),(xEnd/8),(yEnd%256),(yEnd/256),(yStart%256),(yStart/256));
             writeDispRam(xEnd-xStart, yEnd-yStart+1, dispBuffer, xStart, xEnd, yStart, yEnd);
             updatePart();
-            sleep();
+           // sleep();
             partDisplay((xStart/8),(xEnd/8),(yEnd%256),(yEnd/256),(yStart%256),(yStart/256));
             writeDispRam(xEnd-xStart, yEnd-yStart+1, dispBuffer, xStart, xEnd, yStart, yEnd);
         }
@@ -611,10 +614,10 @@ public class EPAPER {
     {
         Log.d("DISPLAY UPDATE", "CLEAR");
         epdFull();
-        sleep();
+       // sleep();
         byte[] buffer = new byte[]{(byte)0xff};
         dispFull(buffer, 0);
-        sleep();
+       // sleep();
     }
 
     public void dispClearPart()
@@ -709,8 +712,10 @@ public class EPAPER {
         Bitmap pImage = Bitmap.createBitmap(xSize, ySize, Bitmap.Config.ARGB_8888);
         Canvas pCanvas = new Canvas(pImage);
         pCanvas.drawColor(Color.WHITE);
-        pCanvas.drawBitmap(input, matrix, paint);
-        int arraySize = input.getByteCount();
+        Rect src = new Rect(x, y, (x+xSize), (y+ySize));
+        Rect dest = new Rect(0, 0, pImage.getWidth(), pImage.getHeight());
+        pCanvas.drawBitmap(input, src, dest, paint);
+        int arraySize = pImage.getByteCount();
         int[] pixels = new int[arraySize];
         pImage.getPixels(pixels, 0, pImage.getWidth(), 0, 0, pImage.getWidth(), pImage.getHeight());
         //dispFull(imageConvert(pixels),1);
