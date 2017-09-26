@@ -1,4 +1,4 @@
-# iot-waveshare-epd
+# Waveshare-Epaper-AndroidThings-Library
 
 Conversion of python waveshare library for their e-paper display into java, specifically for androidthings. This library will allow you to write your android layout directly to the e-paper display.
 
